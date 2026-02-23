@@ -10,16 +10,9 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Form, UploadFile, File
 
-from app.services.nlp_pipeline import run_pipeline, load_dataset
+from app.services.nlp_pipeline import run_pipeline
 
 router = APIRouter()
-
-
-@router.on_event("startup")
-async def preload_dataset():
-    """Load arXiv dataset + build TF-IDF at server startup."""
-    loop = asyncio.get_event_loop()
-    await loop.run_in_executor(None, load_dataset)
 
 
 @router.post("/analyze")

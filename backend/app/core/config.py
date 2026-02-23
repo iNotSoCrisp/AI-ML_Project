@@ -1,17 +1,19 @@
 from pydantic_settings import BaseSettings
 from typing import List
+import os
 
 
 class Settings(BaseSettings):
     APP_NAME: str = "AI-ML Project API"
-    APP_ENV: str = "development"
-    DEBUG: bool = True
+    APP_ENV: str = os.getenv("APP_ENV", "development")
+    DEBUG: bool = os.getenv("DEBUG", "true").lower() == "true"
     API_V1_PREFIX: str = "/api/v1"
     ALLOWED_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://localhost:5173",
         "http://localhost:5174",
         "http://localhost:5175",
+        "https://ai-ml-project-blue.vercel.app",
     ]
 
     class Config:

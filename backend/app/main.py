@@ -32,6 +32,14 @@ def create_app() -> FastAPI:
         analyze.router, prefix=f"{settings.API_V1_PREFIX}/ml", tags=["NLP"]
     )
 
+    @app.on_event("startup")
+    async def load_nlp_data():
+        """Load arXiv dataset and build TF-IDF corpus at startup."""
+        import asyncio
+        from app.services.nlp_pipeline import load_dataset
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, load_dataset)
+
     @app.get("/", tags=["Root"])
     async def root():
         return {"message": f"Welcome to {settings.APP_NAME}"}

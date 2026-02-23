@@ -45,7 +45,7 @@ export default function InputPanel({ onAnalyze, loading }) {
     const removeFile = name => setFiles(f => f.filter(x => x.name !== name));
 
     /* ── submit ─── */
-    const canSubmit = (keywords.length > 0 || files.length > 0) && !loading;
+    const canSubmit = keywords.length > 0 && !loading;
     const handleSubmit = () => {
         if (!canSubmit) return;
         onAnalyze({ keywords, files, numTopics: +numTopics, summaryLen: +summaryLen, useBoW });
@@ -62,7 +62,10 @@ export default function InputPanel({ onAnalyze, loading }) {
 
                 {/* ── Topic Keywords ── */}
                 <div>
-                    <div className="field-label"><span>🏷️</span> Topic Keywords</div>
+                    <div className="field-label"><span>🏷️</span> Research Topic Keywords</div>
+                    <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '0 0 0.5rem 0' }}>
+                        Enter keywords to search 20,000 arXiv research papers
+                    </p>
                     <div className="tag-input-row">
                         <input
                             id="kw-input"
@@ -70,7 +73,7 @@ export default function InputPanel({ onAnalyze, loading }) {
                             value={kInput}
                             onChange={e => setKInput(e.target.value)}
                             onKeyDown={onKwKey}
-                            placeholder="e.g. machine learning…"
+                            placeholder="e.g. machine learning, NLP, neural network…"
                             disabled={loading}
                         />
                         <button className="btn-add-tag" onClick={addKeyword} disabled={!kInput.trim() || loading}>
@@ -89,11 +92,11 @@ export default function InputPanel({ onAnalyze, loading }) {
                     )}
                 </div>
 
-                {/* ── File Upload ── */}
+                {/* ── Optional File Upload ── */}
                 <div>
                     <div className="field-label"><span>📄</span> Upload Documents
                         <span style={{ marginLeft: 'auto', fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'none', letterSpacing: 0 }}>
-                            txt · pdf · docx · md
+                            optional · txt · pdf · docx
                         </span>
                     </div>
                     <label
@@ -191,9 +194,9 @@ export default function InputPanel({ onAnalyze, loading }) {
                         : <><span>🚀</span> Run NLP Analysis</>}
                 </button>
 
-                {keywords.length === 0 && files.length === 0 && (
+                {keywords.length === 0 && (
                     <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '-0.5rem' }}>
-                        Add at least one keyword <em>or</em> upload a document to get started
+                        Add at least one keyword to search the arXiv research corpus
                     </p>
                 )}
             </div>
