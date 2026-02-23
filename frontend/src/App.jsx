@@ -114,7 +114,7 @@ export default function App() {
       /* If backend is not running, fall back to mock data in dev */
       const isDev = import.meta.env.DEV;
       if (isDev && (err instanceof TypeError || err.message.includes('fetch'))) {
-        console.warn('[ResearchLens] Backend unreachable — showing mock data');
+        console.warn('[Pluto] Backend unreachable — showing mock data');
         setResult(MOCK_RESULT);
       } else {
         setError(err.message || 'Unknown error. Check the backend server.');
@@ -131,7 +131,7 @@ export default function App() {
       <header className="header">
         <div className="header-brand">
           <div className="header-icon">🔬</div>
-          <span className="header-title">ResearchLens</span>
+          <span className="header-title">Pluto</span>
         </div>
         <span className="header-badge">Milestone 1 · NLP Pipeline</span>
       </header>
@@ -144,7 +144,7 @@ export default function App() {
 
       {/* ── Footer ── */}
       <footer className="footer">
-        <span>ResearchLens — Traditional NLP Analysis System · Milestone 1</span>
+        <span>Pluto — Traditional NLP Analysis System · Milestone 1</span>
         <div className="footer-links">
           <a href="https://www.kaggle.com/datasets/Cornell-University/arxiv" target="_blank" rel="noreferrer">
             arXiv Dataset

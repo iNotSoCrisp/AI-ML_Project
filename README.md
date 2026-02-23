@@ -1,4 +1,4 @@
-# 🔬 ResearchLens — NLP Research Analysis System
+# 🔬 Pluto — NLP Research Analysis System
 
 > **Milestone 1** · Traditional NLP pipeline for analyzing 20,000 arXiv research papers
 
@@ -11,7 +11,7 @@
 
 ## 📖 Overview
 
-ResearchLens is a full-stack NLP analysis system that lets you search and analyze scientific papers from the arXiv dataset. Enter keywords and the system finds matching papers, extracts key terms, discovers topic clusters, and generates extractive summaries — all using traditional NLP techniques (no LLMs).
+Pluto is a full-stack NLP analysis system that lets you search and analyze scientific papers from the arXiv dataset. Enter keywords and the system finds matching papers, extracts key terms, discovers topic clusters, and generates extractive summaries — all using traditional NLP techniques (no LLMs).
 
 ### ✨ Features
 
