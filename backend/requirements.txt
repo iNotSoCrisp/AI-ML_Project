@@ -9,4 +9,3 @@ nltk
 scikit-learn
 numpy
 pandas
-kagglehub

@@ -1,6 +1,6 @@
 """
 NLP Pipeline Service — Milestone 1
-Adapted from Colab notebook: Uses arXiv Kaggle dataset (20k papers),
+Adapted from Colab notebook: Uses arXiv dataset (20k papers bundled as JSON),
 exact preprocessing pipeline (clean → tokenize → stop-words → lemmatize),
 corpus-level TF-IDF, and extractive summarization.
 No LLMs or pre-trained models used.
@@ -12,6 +12,7 @@ import json
 import string
 import time
 import logging
+from pathlib import Path
 from typing import List, Dict, Any, Optional
 
 import pandas as pd
@@ -116,31 +117,27 @@ def full_preprocess(text: str) -> str:
 
 
 # ──────────────────────────────────────────────────────────────────────────
-# Dataset Loading — arXiv Kaggle (runs once at startup)
+# Dataset Loading — from bundled JSON (runs once at startup)
 # ──────────────────────────────────────────────────────────────────────────
 
-def load_dataset(max_records: int = 20000):
+# Path to the bundled arXiv data file
+_DATA_FILE = Path(__file__).resolve().parent.parent.parent / "data" / "arxiv_20k.json"
+
+
+def load_dataset():
     """
-    Download arXiv dataset via kagglehub, load first N records,
+    Load 20k arXiv papers from bundled JSON file,
     preprocess all abstracts, and build corpus-level TF-IDF matrix.
-    Mirrors the exact Colab pipeline.
+    Mirrors the exact Colab pipeline — no Kaggle credentials needed.
     """
     global _df, _tfidf_vectorizer, _tfidf_matrix, _is_loaded
 
     if _is_loaded:
         return
 
-    logger.info("Loading arXiv dataset from Kaggle...")
-    import kagglehub
-    path = kagglehub.dataset_download("Cornell-University/arxiv")
-    file_path = path + "/arxiv-metadata-oai-snapshot.json"
-
-    data = []
-    with open(file_path, "r") as f:
-        for i, line in enumerate(f):
-            if i >= max_records:
-                break
-            data.append(json.loads(line))
+    logger.info(f"Loading arXiv dataset from {_DATA_FILE}...")
+    with open(_DATA_FILE, "r") as f:
+        data = json.load(f)
 
     _df = pd.DataFrame(data)
     logger.info(f"Loaded {len(_df)} arXiv papers.")
