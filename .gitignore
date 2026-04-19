@@ -25,3 +25,7 @@ dist/
 
 # Kaggle
 .kaggle/
+
+# Graphify & Agent
+.agent/
+graphify-out/

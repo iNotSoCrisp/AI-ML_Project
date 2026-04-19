@@ -1,8 +1,12 @@
+import os
+from dotenv import load_dotenv
+load_dotenv() # Load variables from .env into os.environ
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers import health, analyze
+from app.routers import health, analyze, agent
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -28,6 +32,10 @@ def create_app() -> FastAPI:
 
     app.include_router(
         analyze.router, prefix=f"{settings.API_V1_PREFIX}/ml", tags=["NLP"]
+    )
+    
+    app.include_router(
+        agent.router, prefix=f"{settings.API_V1_PREFIX}/ai", tags=["Agent"]
     )
 
     @app.on_event("startup")
