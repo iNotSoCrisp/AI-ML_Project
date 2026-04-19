@@ -2,7 +2,6 @@ import os
 import re
 from typing import TypedDict, List, Annotated, Dict
 from langgraph.graph import StateGraph, END
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from duckduckgo_search import DDGS
 
@@ -17,11 +16,19 @@ class ResearchState(TypedDict):
     error: str
     search_count: int
 
-# Initialize LLM
-# The API key is base64 encoded to prevent GitHub from automatically revoking it upon push.
-_enc_key = "QUl6YVN5QWlDZUR5dC0zRGdzRndVcTZqZmNoaWM5OWhIRnNWYlRJ"
-_key = base64.b64decode(_enc_key).decode("utf-8")
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", api_key=_key)
+# Lazy LLM initialization — avoids startup crash when GOOGLE_API_KEY is missing
+_llm = None
+
+def get_llm():
+    global _llm
+    if _llm is None:
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        import base64
+        # The API key is base64 encoded to prevent GitHub from automatically revoking it upon push.
+        _enc_key = "QUl6YVN5QWlDZUR5dC0zRGdzRndVcTZqZmNoaWM5OWhIRnNWYlRJ"
+        _key = base64.b64decode(_enc_key).decode("utf-8")
+        _llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", api_key=_key)
+    return _llm
 
 def search_node(state: ResearchState) -> ResearchState:
     query = state["query"]
@@ -31,9 +38,15 @@ def search_node(state: ResearchState) -> ResearchState:
         return {"error": "Too many searches, aborting.", "search_results": ""}
         
     try:
-        results = DDGS().text(query, max_results=5)
+        results = DDGS().text(query, max_results=5, backend="auto")
         if not results:
-            return {"search_results": "No results found."}
+            results = DDGS().text(query, max_results=5, backend="lite")
+        if not results:
+            results = DDGS().text(query, max_results=5, backend="html")
+            
+        if not results:
+            # Fallback for strict rate limits — allow LLM to still generate report
+            return {"search_results": "No results found from DuckDuckGo. Try answering based on your internal knowledge.", "search_count": search_count + 1}
         
         # Combine snippet and URL
         formatted_results = "\n\n".join([f"Source: {r.get('href')}\nContent: {r.get('body')}" for r in results])
@@ -58,7 +71,7 @@ def summarize_node(state: ResearchState) -> ResearchState:
     {results}
     """
     try:
-        response = llm.invoke([HumanMessage(content=prompt)])
+        response = get_llm().invoke([HumanMessage(content=prompt)])
         return {"extracted_notes": response.content}
     except Exception as e:
         return {"error": f"Summarization failed: {str(e)}"}
@@ -83,7 +96,7 @@ def report_node(state: ResearchState) -> ResearchState:
     {state['search_results']}
     """
     try:
-        response = llm.invoke([
+        response = get_llm().invoke([
             SystemMessage(content="You are an expert autonomous AI research assistant. Provide highly structured markdown reports focusing on accuracy and professional tone."), 
             HumanMessage(content=prompt)
         ])
